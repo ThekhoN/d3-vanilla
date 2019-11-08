@@ -7,5 +7,6 @@
     "watch": "parcel watch index.html",
     "bundle": "parcel index.html",
     "start": "npm run bundle && npm run watch"
-  }
+  },
+  "dependencies": {}
 }

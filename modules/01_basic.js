@@ -1,5 +1,3 @@
-import "../styles/00_basic.css";
-
 export default function basic() {
   const data = [100, 250, 175, 200, 120];
   const rectWidth = 100;
