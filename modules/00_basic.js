@@ -9,7 +9,7 @@ export default function basic() {
     .selectAll("rect")
     .data(data)
     .attr("x", (d, i) => i * rectWidth)
-    .attr("y", d => height - d)
+    .attr("y", d => height - d) // this is required to prevent the bar from being inverted
     .attr("width", rectWidth)
     .attr("height", d => d)
     .attr("fill", "blue")
