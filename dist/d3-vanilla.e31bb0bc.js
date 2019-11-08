@@ -184,7 +184,7 @@ function reloadCSS() {
 }
 
 module.exports = reloadCSS;
-},{"./bundle-url":"../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"styles/basic.css":[function(require,module,exports) {
+},{"./bundle-url":"../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"styles/00_basic.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
@@ -197,7 +197,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = basic;
 
-require("../styles/basic.css");
+require("../styles/00_basic.css");
 
 function basic() {
   var data = [100, 250, 175, 200, 120];
@@ -211,7 +211,7 @@ function basic() {
     return d;
   }).attr("fill", "blue").attr("stroke", "#fff");
 }
-},{"../styles/basic.css":"styles/basic.css"}],"index.js":[function(require,module,exports) {
+},{"../styles/00_basic.css":"styles/00_basic.css"}],"index.js":[function(require,module,exports) {
 "use strict";
 
 var _basic = _interopRequireDefault(require("./modules/00_basic"));
@@ -247,7 +247,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49489" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63320" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

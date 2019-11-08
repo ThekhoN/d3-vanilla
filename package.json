@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "watch": "parcel watch index.html",
-    "start": "parcel index.html"
+    "bundle": "parcel index.html",
+    "start": "npm run bundle && npm run watch"
   }
 }
