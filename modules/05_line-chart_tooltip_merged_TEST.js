@@ -17,66 +17,61 @@ const monthNames = [
 
 const data = [
   {
-    date: "1-May-12",
-    value: 58.13
+    adamId: 34123455,
+    trackName: "Cowboys from Hell",
+    artist: "Pantera",
+    period: "201812",
+    streamCount: 16000
   },
   {
-    date: "30-Apr-12",
-    value: 53.98
-  },
-  {
-    date: "27-Apr-12",
-    value: 67.0
-  },
-  {
-    date: "26-Apr-12",
-    value: 89.7
+    adamId: 34123455,
+    trackName: "Cowboys from Hell",
+    artist: "Pantera",
+    period: "201903",
+    streamCount: 20000
   }
 ];
-
 const data2 = [
   {
-    date: "1-May-12",
-    value: 68.13
+    adamId: 34123666,
+    trackName: "Ace of Spades",
+    artist: "Motorhead",
+    period: "201812",
+    streamCount: 16880
   },
   {
-    date: "30-Apr-12",
-    value: 93.98
+    adamId: 34123666,
+    trackName: "Ace of Spades",
+    artist: "Motorhead",
+    period: "201903",
+    streamCount: 22000
+  }
+];
+const data3 = [
+  {
+    adamId: 34129696,
+    trackName: "Seasons in the Abyss",
+    artist: "Slayer",
+    period: "201812",
+    streamCount: 13000
   },
   {
-    date: "27-Apr-12",
-    value: 47.0
-  },
-  {
-    date: "26-Apr-12",
-    value: 29.7
+    adamId: 34129696,
+    trackName: "Seasons in the Abyss",
+    artist: "Slayer",
+    period: "201903",
+    streamCount: 19000
   }
 ];
 
-const data3 = [
-  {
-    date: "1-May-12",
-    value: 88.13
-  },
-  {
-    date: "30-Apr-12",
-    value: 13.98
-  },
-  {
-    date: "27-Apr-12",
-    value: 57.0
-  },
-  {
-    date: "26-Apr-12",
-    value: 409.7
-  }
-];
+const KEY_Y_AXIS = "streamCount";
+const KEY_X_AXIS = "period";
 
 export default function lineChart() {
   // merge all data
   const allData = [...data, ...data2, ...data3];
   const allDataSortedByValue = allData.sort((a, b) => {
-    if (a.value > b.value) {
+    if (a[KEY_Y_AXIS] > b[KEY_Y_AXIS]) {
       return 1;
     } else {
       return -1;
@@ -84,8 +79,8 @@ export default function lineChart() {
   });
 
   // determine min and max
-  // const minValue = allDataSortedByValue[0].value;
-  const maxValue = allDataSortedByValue[allDataSortedByValue.length - 1].value;
+  const maxValue =
+    allDataSortedByValue[allDataSortedByValue.length - 1][KEY_Y_AXIS];
 
   // withTooltip
   // Set the dimensions of the canvas / graph
@@ -97,13 +92,12 @@ export default function lineChart() {
   const updatedData2 = getUpdatedData(data2);
   const updatedData3 = getUpdatedData(data3);
 
-  const xExtent = d3.extent(updatedData.map(item => item.date));
+  const xExtent = d3.extent(updatedData.map(item => item[KEY_X_AXIS]));
   const xScale = d3
     .scaleTime()
     .domain(xExtent)
     .range([margin.left, width - margin.right]);
 
-  // const yExtent = d3.extent(updatedData.map(item => item.value));
   const yScale = d3
     .scaleLinear()
     .domain([0, maxValue])
@@ -112,10 +106,10 @@ export default function lineChart() {
   const valueline = d3
     .line()
     .x(d => {
-      return xScale(d["date"]);
+      return xScale(d[KEY_X_AXIS]);
     })
     .y(d => {
-      return yScale(d["value"]);
+      return yScale(d[KEY_Y_AXIS]);
     })
     .curve(d3.curveCatmullRom);
 
@@ -127,59 +121,68 @@ export default function lineChart() {
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
+  d3.select("div.tooltip")
+    .append("span")
+    .attr("class", "tooltip-arrow");
+  d3.select("div.tooltip")
+    .append("div")
+    .attr("class", "tooltip-content");
 
+  // create axes and append them
+  const xAxis = d3.axisBottom().scale(xScale);
+  xAxis.ticks(2);
+  xAxis.tickFormat((d, index, arr) => {
+    const month = Number(d.getMonth()) + 1;
+    if (index === 0 || index === arr.length - 1) {
+      return getQuarterValue(month) + " " + d.getFullYear();
+    }
+  });
+
+  const yAxis = d3.axisLeft().scale(yScale);
+  yAxis.tickFormat(d => {
+    return d3.format("~s")(Number(d));
+  });
+  svg
+    .append("g")
+    .attr("class", "x-axis")
+    .attr("transform", `translate(0, ${height - margin.bottom})`)
+    .call(xAxis);
+  svg
+    .append("g")
+    .attr("class", "y-axis")
+    .attr("transform", `translate(${margin.left}, 0)`)
+    .call(yAxis);
+
+  // render lineGraph paths - LAST
   // first lineGraph path
   addLineGraphPath(svg, updatedData, valueline, "blue");
   addTooltip(svg, updatedData, xScale, yScale, tooltipWrapper);
   // second lineGraph path
   addLineGraphPath(svg, updatedData2, valueline, "red");
   addTooltip(svg, updatedData2, xScale, yScale, tooltipWrapper);
-  // third lineGraph path
+  // // third lineGraph path
   addLineGraphPath(svg, updatedData3, valueline, "orange");
   addTooltip(svg, updatedData3, xScale, yScale, tooltipWrapper);
-
-  // create axes and append them
-  const xAxis = d3.axisBottom().scale(xScale);
-  xAxis.tickFormat(d => {
-    return d.getDate() + " " + monthNames[d.getMonth()];
-  });
-  xAxis.ticks(4);
-
-  const yAxis = d3.axisLeft().scale(yScale);
-  yAxis.ticks(20);
-  svg
-    .append("g")
-    .attr("transform", `translate(0, ${height - margin.bottom})`)
-    .call(xAxis);
-  svg
-    .append("g")
-    .attr("transform", `translate(${margin.left}, 0)`)
-    .call(yAxis);
 }
 
-// reusable modules
+/********************************************************************/
+// Reusable Modules
+/********************************************************************/
 function getUpdatedData(data) {
   let updatedData = [];
   data.forEach(dataItem => {
-    let item = {};
-    item["value"] = dataItem["value"];
-    item["date"] = d3.timeParse("%d-%b-%y")(dataItem["date"]);
+    let item = { ...dataItem };
+    item[KEY_Y_AXIS] = dataItem[KEY_Y_AXIS];
+    const formattedPeriod =
+      dataItem[KEY_X_AXIS].slice(0, 4) + "-" + dataItem[KEY_X_AXIS].slice(4);
+    item[KEY_X_AXIS] = d3.timeParse("%Y-%m")(formattedPeriod);
     updatedData.push(item);
   });
   return updatedData;
 }
 
 function getRenderContent(dataItem) {
-  return (
-    dataItem.date.getDate() +
-    " " +
-    monthNames[dataItem.date.getMonth()] +
-    " " +
-    dataItem.date.getFullYear() +
-    "<br/>" +
-    "value: " +
-    dataItem.value
-  );
+  return `${dataItem.trackName}: &nbsp; <b>${dataItem.streamCount}</b>`;
 }
 
 // Add line graph path
@@ -200,20 +203,24 @@ function addTooltip(svg, data, xScale, yScale, tooltipWrapper) {
     .append("circle")
     .attr("r", 5)
     .attr("cx", function(d) {
-      return xScale(d.date);
+      return xScale(d[KEY_X_AXIS]);
     })
     .attr("cy", function(d) {
-      return yScale(d.value);
+      return yScale(d[KEY_Y_AXIS]);
     })
     .on("mouseover", function(d) {
       tooltipWrapper
         .transition()
         .duration(200)
         .style("opacity", 0.9);
+
+      // debugger;
+      // tooltipWrapper
+      // .select(this)
+      d3.select("div.tooltip-content").html(getRenderContent(d));
       tooltipWrapper
-        .html(getRenderContent(d))
-        .style("left", d3.event.pageX + "px")
-        .style("top", d3.event.pageY - 28 + "px");
+        .style("left", d3.event.pageX + 3 + "px")
+        .style("top", d3.event.pageY - 28 + 3 + "px");
     })
     .on("mouseout", function(d) {
       tooltipWrapper
@@ -221,4 +228,21 @@ function addTooltip(svg, data, xScale, yScale, tooltipWrapper) {
         .duration(500)
         .style("opacity", 0);
     });
+}
+
+// getQuarterValue
+function getQuarterValue(month) {
+  const parsedMonth = Number(month);
+  if (parsedMonth < 1 || parsedMonth > 12) {
+    throw new Error("Invalid month");
+  }
+  if (parsedMonth > 0 && parsedMonth < 4) {
+    return "Q1";
+  } else if (parsedMonth > 3 && parsedMonth < 7) {
+    return "Q2";
+  } else if (parsedMonth > 6 && parsedMonth < 10) {
+    return "Q3";
+  } else {
+    return "Q4";
+  }
 }
